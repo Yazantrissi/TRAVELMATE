@@ -11,6 +11,13 @@ const tripRoutes = require('./src/routes/TripRoutes');
 
 const app = express();
 
+const friendRoutes = require('./src/routes/FriendRoutes');
+
+const bookingRoutes = require('./src/routes/BookingRoutes');
+app.use('/api/bookings', bookingRoutes);
+// ... بعد روابط الرحلات
+app.use('/api/friends', friendRoutes);
+
 // ===================================
 // 2. تطبيق Middlewares العامة
 // ===================================
