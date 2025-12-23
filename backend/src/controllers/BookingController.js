@@ -52,3 +52,31 @@ exports.initiateGroupBooking = async (req, res) => {
         res.status(500).json({ message: 'فشل في بدء عملية الحجز.', error: error.message });
     }
 };
+// دالة معالجة التنبيهات القادمة من Stripe
+exports.handleStripeWebhook = async (req, res) => {
+    const sig = req.headers['stripe-signature'];
+    let event;
+
+    try {
+        // التحقق من أن الطلب قادم فعلاً من Stripe وليس شخصاً آخر
+        event = stripe.webhooks.constructEvent(
+            req.body, 
+            sig, 
+            process.env.STRIPE_WEBHOOK_SECRET
+        );
+    } catch (err) {
+        return res.status(400).send(`Webhook Error: ${err.message}`);
+    }
+
+    // التعامل مع نوع الحدث
+    if (event.type === 'payment_intent.succeeded') {
+        const paymentIntent = event.data.object;
+        
+        // تحديث حالة الحجز في قاعدة البيانات باستخدام الـ id الخاص بـ Stripe
+        await BookingModel.updateStatus(paymentIntent.id, 'confirmed');
+        
+        console.log(`💰 Payment Succeeded for ID: ${paymentIntent.id}`);
+    }
+
+    res.json({ received: true });
+};
