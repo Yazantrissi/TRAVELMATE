@@ -1,67 +1,37 @@
 const express = require('express');
 const cors = require('cors');
-const helmet = require('helmet');
-require('dotenv').config(); // لتحميل المتغيرات البيئية من .env
+require('dotenv').config();
 
-// ===================================
-// 1. استيراد الروابط (Routes)
-// ===================================
 const authRoutes = require('./src/routes/AuthRoutes');
 const tripRoutes = require('./src/routes/TripRoutes');
+const friendRoutes = require('./src/routes/FriendRoutes');
+const bookingRoutes = require('./src/routes/BookingRoutes');
+const notificationRoutes = require('./src/routes/NotificationRoutes');
 
 const app = express();
 
-const friendRoutes = require('./src/routes/FriendRoutes');
+// إعداد CORS للسماح لتطبيق Flutter بالاتصال
+app.use(cors());
 
-const bookingRoutes = require('./src/routes/BookingRoutes');
-app.use('/api/bookings', bookingRoutes);
-// ... بعد روابط الرحلات
-app.use('/api/friends', friendRoutes);
+// ملاحظة هامة: الـ Webhook يحتاج لبيانات Raw قبل تحويلها لـ JSON
+app.use('/api/bookings/webhook', express.raw({ type: 'application/json' }));
 
-// ===================================
-// 2. تطبيق Middlewares العامة
-// ===================================
+// بقية المسارات تستخدم JSON العادي
+app.use(express.json());
 
-// الحماية: إعداد HTTP Headers لتحسين الأمان (Cross-Site Scripting, إلخ)
-app.use(helmet()); 
-
-// السماح بالوصول من تطبيق Flutter (Cors)
-app.use(cors()); 
-
-// لقراءة بيانات JSON المرسلة في جسم الطلب (Body)
-app.use(express.json()); 
-
-// لقراءة البيانات من Form Data (إذا احتجنا رفع ملفات أو بيانات نموذجية)
-app.use(express.urlencoded({ extended: true }));
-
-
-// ===================================
-// 3. ربط الـ Routes
-// ===================================
-
-// رابط التحقق والتسجيل: POST /api/auth/register, POST /api/auth/login
-app.use('/api/auth', authRoutes); 
-
-// رابط الرحلات: GET /api/trips, POST /api/trips (Admin)
+// تعريف الروابط (Routes)
+app.use('/api/auth', authRoutes);
 app.use('/api/trips', tripRoutes);
+app.use('/api/friends', friendRoutes);
+app.use('/api/bookings', bookingRoutes);
+app.use('/api/notifications', notificationRoutes);
 
-
-// ===================================
-// 4. رابط اختبار وصحة النظام (Health Check)
-// ===================================
+// اختبار السيرفر
 app.get('/', (req, res) => {
-    res.json({ 
-        message: "Welcome to Travelmate API",
-        status: "OK",
-        version: "1.0"
-    });
+    res.send('Travelmate API is running successfully...');
 });
 
-// ===================================
-// 5. تشغيل السيرفر
-// ===================================
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-    console.log(`Server is running successfully on port ${PORT}`);
-    console.log(`Access at: http://localhost:${PORT}`);
+    console.log(`🚀 Server is running on http://localhost:${PORT}`);
 });
