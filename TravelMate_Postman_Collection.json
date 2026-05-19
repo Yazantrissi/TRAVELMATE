@@ -484,6 +484,117 @@
               ]
             }
           }
+        },
+        {
+          "name": "Send message to room (authenticated)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/chat/rooms/{{tripId}}/messages",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "chat",
+                "rooms",
+                "{{tripId}}",
+                "messages"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"content\": \"{{chat_room_message}}\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200/201', function () {",
+                  "  pm.expect([200, 201]).to.include(pm.response.code);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Chatbot (LLM)",
+      "item": [
+        {
+          "name": "Bot message (authenticated)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/chat/bot/message",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "chat",
+                "bot",
+                "message"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"message\": \"{{bot_message}}\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "const json = pm.response.json();",
+                  "pm.test('reply exists', function () {",
+                  "  pm.expect(json.reply).to.be.a('string');",
+                  "});"
+                ]
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (!pm.environment.get('bot_message')) {",
+                  "  pm.environment.set('bot_message', 'اعطيني خطة رحلة ليوم واحد في القاهرة');",
+                  "}"
+                ]
+              }
+            }
+          ]
         }
       ]
     }
@@ -572,6 +683,14 @@
     {
       "key": "trip_max_seats",
       "value": "20"
+    },
+    {
+      "key": "chat_room_message",
+      "value": "مرحباً!"
+    },
+    {
+      "key": "bot_message",
+      "value": "اعطيني خطة رحلة ليوم واحد في القاهرة"
     }
   ]
 }
