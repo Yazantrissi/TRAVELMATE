@@ -1,0 +1,1304 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TravelMate — لوحة التحكم</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --p: #FF7A59;
+      --pd: #E05A3A;
+      --bg: #0F0F13;
+      --s: #1A1A22;
+      --s2: #22222E;
+      --b: #2E2E3E;
+      --t: #F0EEF8;
+      --m: #7A788A;
+      --g: #2ECC71;
+      --w: #F39C12;
+      --r: #E74C3C;
+      --i: #3498DB;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Cairo', sans-serif;
+      background: var(--bg);
+      color: var(--t);
+      min-height: 100vh;
+      display: flex;
+    }
+
+    .sidebar {
+      width: 240px;
+      min-height: 100vh;
+      background: var(--s);
+      border-left: 1px solid var(--b);
+      display: flex;
+      flex-direction: column;
+      position: fixed;
+      right: 0;
+      top: 0;
+      z-index: 100;
+    }
+
+    .logo {
+      padding: 26px 22px;
+      border-bottom: 1px solid var(--b);
+    }
+
+    .logo h1 {
+      font-size: 20px;
+      font-weight: 900;
+      color: var(--p);
+    }
+
+    .logo span {
+      font-size: 11px;
+      color: var(--m);
+    }
+
+    .nav {
+      flex: 1;
+      padding: 14px 10px;
+    }
+
+    .ni {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 11px 14px;
+      border-radius: 10px;
+      cursor: pointer;
+      margin-bottom: 3px;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--m);
+      transition: all .2s;
+      border: none;
+      background: none;
+      width: 100%;
+      text-align: right;
+    }
+
+    .ni:hover {
+      background: var(--s2);
+      color: var(--t);
+    }
+
+    .ni.active {
+      background: rgba(255, 122, 89, .15);
+      color: var(--p);
+    }
+
+    .ni .ic {
+      font-size: 17px;
+      min-width: 22px;
+      text-align: center;
+    }
+
+    .sf {
+      padding: 14px;
+      border-top: 1px solid var(--b);
+    }
+
+    .ab {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 12px;
+      background: var(--s2);
+      border-radius: 10px;
+    }
+
+    .av {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      background: var(--p);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      color: #fff;
+      font-size: 14px;
+    }
+
+    .ai strong {
+      display: block;
+      font-size: 13px;
+    }
+
+    .ai span {
+      color: var(--m);
+      font-size: 11px;
+    }
+
+    .main {
+      margin-right: 240px;
+      flex: 1;
+      padding: 28px;
+    }
+
+    .page {
+      display: none;
+    }
+
+    .page.active {
+      display: block;
+      animation: fi .25s ease;
+    }
+
+    @keyframes fi {
+      from {
+        opacity: 0;
+        transform: translateY(6px)
+      }
+
+      to {
+        opacity: 1;
+        transform: none
+      }
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .topbar-left h2 {
+      font-size: 22px;
+      font-weight: 900;
+    }
+
+    .topbar-left p {
+      color: var(--m);
+      font-size: 13px;
+      margin-top: 3px;
+    }
+
+    .topbar-right {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 14px;
+      margin-bottom: 22px;
+    }
+
+    .sc {
+      background: var(--s);
+      border: 1px solid var(--b);
+      border-radius: 14px;
+      padding: 20px;
+      transition: transform .2s;
+    }
+
+    .sc:hover {
+      transform: translateY(-2px);
+    }
+
+    .si {
+      font-size: 26px;
+      margin-bottom: 10px;
+    }
+
+    .sv {
+      font-size: 28px;
+      font-weight: 900;
+      margin-bottom: 3px;
+    }
+
+    .sc.o .sv {
+      color: var(--p);
+    }
+
+    .sc.g .sv {
+      color: var(--g);
+    }
+
+    .sc.b .sv {
+      color: var(--i);
+    }
+
+    .sc.y .sv {
+      color: var(--w);
+    }
+
+    .sl {
+      font-size: 12px;
+      color: var(--m);
+      font-weight: 600;
+    }
+
+    .card {
+      background: var(--s);
+      border: 1px solid var(--b);
+      border-radius: 14px;
+      overflow: hidden;
+      margin-bottom: 18px;
+    }
+
+    .ch {
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--b);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .ch h3 {
+      font-size: 15px;
+      font-weight: 700;
+    }
+
+    .tw {
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    th {
+      padding: 11px 16px;
+      text-align: right;
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--m);
+      text-transform: uppercase;
+      background: var(--s2);
+    }
+
+    td {
+      padding: 13px 16px;
+      font-size: 13px;
+      border-top: 1px solid var(--b);
+      vertical-align: middle;
+    }
+
+    tr:hover td {
+      background: rgba(255, 122, 89, .04);
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 3px 9px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    .badge.confirmed,
+    .badge.ready {
+      background: rgba(46, 204, 113, .15);
+      color: var(--g);
+    }
+
+    .badge.pending {
+      background: rgba(243, 156, 18, .15);
+      color: var(--w);
+    }
+
+    .badge.cancelled {
+      background: rgba(231, 76, 60, .15);
+      color: var(--r);
+    }
+
+    .badge.admin {
+      background: rgba(255, 122, 89, .15);
+      color: var(--p);
+    }
+
+    .badge.client {
+      background: rgba(52, 152, 219, .15);
+      color: var(--i);
+    }
+
+    .fg {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      padding: 20px;
+    }
+
+    .fg .f {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+
+    .fg .f.full {
+      grid-column: 1/-1;
+    }
+
+    label {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--m);
+      text-transform: uppercase;
+    }
+
+    input,
+    textarea,
+    select {
+      background: var(--s2);
+      border: 1.5px solid var(--b);
+      border-radius: 9px;
+      padding: 10px 13px;
+      color: var(--t);
+      font-family: 'Cairo', sans-serif;
+      font-size: 14px;
+      transition: border-color .2s;
+      outline: none;
+      width: 100%;
+    }
+
+    input:focus,
+    textarea:focus,
+    select:focus {
+      border-color: var(--p);
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 75px;
+    }
+
+    select option {
+      background: var(--s2);
+    }
+
+    .fa {
+      padding: 0 20px 20px;
+      display: flex;
+      gap: 10px;
+    }
+
+    .btn {
+      padding: 10px 20px;
+      border-radius: 9px;
+      font-family: 'Cairo', sans-serif;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      border: none;
+      transition: all .2s;
+    }
+
+    .btn-p {
+      background: var(--p);
+      color: #fff;
+    }
+
+    .btn-p:hover {
+      background: var(--pd);
+    }
+
+    .btn-s {
+      background: var(--s2);
+      color: var(--m);
+      border: 1.5px solid var(--b);
+    }
+
+    .btn-s:hover {
+      border-color: var(--p);
+      color: var(--p);
+    }
+
+    .btn-g {
+      background: rgba(46, 204, 113, .15);
+      color: var(--g);
+      border: 1.5px solid rgba(46, 204, 113, .3);
+    }
+
+    .btn-g:hover {
+      background: rgba(46, 204, 113, .3);
+    }
+
+    .btn-d {
+      background: rgba(231, 76, 60, .1);
+      color: var(--r);
+      border: 1.5px solid rgba(231, 76, 60, .25);
+    }
+
+    .btn-d:hover {
+      background: rgba(231, 76, 60, .2);
+    }
+
+    .btn-w {
+      background: rgba(243, 156, 18, .1);
+      color: var(--w);
+      border: 1.5px solid rgba(243, 156, 18, .25);
+    }
+
+    .btn-w:hover {
+      background: rgba(243, 156, 18, .2);
+    }
+
+    .btn-sm {
+      padding: 5px 12px;
+      font-size: 12px;
+    }
+
+    .acts {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    #ls {
+      position: fixed;
+      inset: 0;
+      background: var(--bg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 999;
+    }
+
+    .lb {
+      background: var(--s);
+      border: 1px solid var(--b);
+      border-radius: 22px;
+      padding: 38px;
+      width: 370px;
+    }
+
+    .ll {
+      text-align: center;
+      margin-bottom: 28px;
+    }
+
+    .ll h1 {
+      font-size: 28px;
+      font-weight: 900;
+      color: var(--p);
+    }
+
+    .ll p {
+      color: var(--m);
+      font-size: 13px;
+      margin-top: 4px;
+    }
+
+    .lb .f {
+      margin-bottom: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+
+    .btn-l {
+      width: 100%;
+      margin-top: 8px;
+      padding: 13px;
+      font-size: 15px;
+    }
+
+    .em2 {
+      color: var(--r);
+      font-size: 13px;
+      text-align: center;
+      margin-top: 8px;
+      display: none;
+    }
+
+    .ld {
+      text-align: center;
+      padding: 40px;
+      color: var(--m);
+      font-size: 14px;
+    }
+
+    .sp {
+      width: 30px;
+      height: 30px;
+      border: 3px solid var(--b);
+      border-top-color: var(--p);
+      border-radius: 50%;
+      animation: sp .7s linear infinite;
+      margin: 0 auto 10px;
+    }
+
+    @keyframes sp {
+      to {
+        transform: rotate(360deg)
+      }
+    }
+
+    .toast {
+      position: fixed;
+      bottom: 22px;
+      left: 22px;
+      background: var(--s);
+      border: 1px solid var(--b);
+      border-radius: 10px;
+      padding: 13px 18px;
+      font-size: 14px;
+      font-weight: 600;
+      z-index: 9999;
+      transform: translateY(60px);
+      opacity: 0;
+      transition: all .3s;
+    }
+
+    .toast.show {
+      transform: none;
+      opacity: 1;
+    }
+
+    .toast.ok {
+      border-color: var(--g);
+      color: var(--g);
+    }
+
+    .toast.er {
+      border-color: var(--r);
+      color: var(--r);
+    }
+
+    .sb {
+      background: var(--s2);
+      border: 1.5px solid var(--b);
+      border-radius: 9px;
+      padding: 9px 14px;
+      color: var(--t);
+      font-family: 'Cairo', sans-serif;
+      font-size: 14px;
+      outline: none;
+    }
+
+    .sb:focus {
+      border-color: var(--p);
+    }
+
+    .empty {
+      text-align: center;
+      padding: 44px;
+      color: var(--m);
+    }
+
+    .ei {
+      font-size: 44px;
+      opacity: .35;
+      margin-bottom: 10px;
+    }
+
+    .mo {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, .7);
+      z-index: 500;
+      display: none;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .mo.open {
+      display: flex;
+    }
+
+    .mbox {
+      background: var(--s);
+      border: 1px solid var(--b);
+      border-radius: 18px;
+      width: 520px;
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+
+    .mh {
+      padding: 18px 22px;
+      border-bottom: 1px solid var(--b);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .mh h3 {
+      font-size: 16px;
+      font-weight: 700;
+    }
+
+    .mc {
+      background: none;
+      border: none;
+      color: var(--m);
+      font-size: 20px;
+      cursor: pointer;
+      line-height: 1;
+    }
+
+    .rbtn {
+      background: var(--s2);
+      border: 1.5px solid var(--b);
+      border-radius: 9px;
+      padding: 8px 14px;
+      color: var(--m);
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: all .2s;
+    }
+
+    .rbtn:hover {
+      border-color: var(--p);
+      color: var(--p);
+    }
+
+    img.ti {
+      width: 52px;
+      height: 38px;
+      object-fit: cover;
+      border-radius: 6px;
+      margin-left: 8px;
+      vertical-align: middle;
+    }
+
+    .hint {
+      font-size: 11px;
+      color: var(--m);
+      margin-top: 4px;
+    }
+
+    .confirm-mo {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, .7);
+      z-index: 600;
+      display: none;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .confirm-mo.open {
+      display: flex;
+    }
+
+    .confirm-box {
+      background: var(--s);
+      border: 1px solid var(--b);
+      border-radius: 16px;
+      padding: 28px;
+      width: 340px;
+      text-align: center;
+    }
+
+    .confirm-box h3 {
+      font-size: 17px;
+      font-weight: 700;
+      margin-bottom: 10px;
+    }
+
+    .confirm-box p {
+      color: var(--m);
+      font-size: 14px;
+      margin-bottom: 22px;
+    }
+
+    .confirm-actions {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- Login -->
+  <div id="ls">
+    <div class="lb">
+      <div class="ll">
+        <h1>✈ TravelMate</h1>
+        <p>لوحة تحكم المدير</p>
+      </div>
+      <div class="f"><label>البريد الإلكتروني</label>
+        <input type="email" id="le" placeholder="admin@travelmate.com" value="admin@travelmate.com">
+      </div>
+      <div class="f"><label>كلمة المرور</label>
+        <input type="password" id="lp" placeholder="••••••••" value=""
+          onkeydown="if(event.key==='Enter')doLogin()">
+      </div>
+      <button class="btn btn-p btn-l" onclick="doLogin()">دخول إلى اللوحة</button>
+      <div class="em2" id="lerr"></div>
+    </div>
+  </div>
+
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <div class="logo">
+      <h1>✈ TravelMate</h1><span>Admin Dashboard</span>
+    </div>
+    <nav class="nav">
+      <button class="ni active" onclick="go('db',this)"><span class="ic">📊</span>الرئيسية</button>
+      <button class="ni" onclick="go('tr',this)"><span class="ic">🗺️</span>الرحلات</button>
+      <button class="ni" onclick="go('bk',this)"><span class="ic">📋</span>الحجوزات</button>
+      <button class="ni" onclick="go('us',this)"><span class="ic">👥</span>المستخدمون</button>
+      <button class="ni" onclick="go('at',this)"><span class="ic">➕</span>إضافة رحلة</button>
+      <button class="ni" onclick="go('au',this)"><span class="ic">👤</span>إضافة مستخدم</button>
+    </nav>
+    <div class="sf">
+      <div class="ab">
+        <div class="av">A</div>
+        <div class="ai"><strong id="an">Admin</strong><span>مدير النظام</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main -->
+  <main class="main">
+
+    <!-- Dashboard -->
+    <div class="page active" id="page-db">
+      <div class="topbar">
+        <div class="topbar-left">
+          <h2>مرحباً 👋</h2>
+          <p>نظرة عامة على نشاط التطبيق</p>
+        </div>
+        <button class="rbtn" onclick="loadDB()">🔄 تحديث</button>
+      </div>
+      <div class="stats" id="sg">
+        <div class="ld">
+          <div class="sp"></div>جاري التحميل...
+        </div>
+      </div>
+      <div class="card">
+        <div class="ch">
+          <h3>📋 الحجوزات المعلقة — تحتاج مراجعة</h3>
+          <span id="pendingCount"
+            style="background:rgba(243,156,18,.2);color:var(--w);padding:4px 12px;border-radius:20px;font-size:12px;font-weight:700;"></span>
+        </div>
+        <div id="rb">
+          <div class="ld">
+            <div class="sp"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Trips -->
+    <div class="page" id="page-tr">
+      <div class="topbar">
+        <div class="topbar-left">
+          <h2>🗺️ الرحلات</h2>
+          <p>إدارة جميع الرحلات</p>
+        </div>
+        <div class="topbar-right">
+          <input class="sb" placeholder="🔍 بحث..." oninput="ftrips(this.value)" style="width:200px">
+          <button class="btn btn-p" onclick="go('at',null)">+ إضافة رحلة</button>
+        </div>
+      </div>
+      <div class="card">
+        <div id="tt">
+          <div class="ld">
+            <div class="sp"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bookings -->
+    <div class="page" id="page-bk">
+      <div class="topbar">
+        <div class="topbar-left">
+          <h2>📋 الحجوزات</h2>
+          <p>إدارة جميع الحجوزات</p>
+        </div>
+        <div class="topbar-right">
+          <select class="sb" onchange="filterByStatus(this.value)" style="width:150px">
+            <option value="">كل الحجوزات</option>
+            <option value="pending">معلق</option>
+            <option value="confirmed">مؤكد</option>
+            <option value="ready">جاهز</option>
+            <option value="cancelled">ملغي</option>
+          </select>
+          <input class="sb" placeholder="🔍 بحث..." oninput="fbk(this.value)" style="width:180px">
+        </div>
+      </div>
+      <div class="card">
+        <div id="bt">
+          <div class="ld">
+            <div class="sp"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Users -->
+    <div class="page" id="page-us">
+      <div class="topbar">
+        <div class="topbar-left">
+          <h2>👥 المستخدمون</h2>
+          <p>إدارة جميع المسجلين</p>
+        </div>
+        <div class="topbar-right">
+          <input class="sb" placeholder="🔍 بحث..." oninput="fus(this.value)" style="width:200px">
+          <button class="btn btn-p" onclick="go('au',null)">+ إضافة مستخدم</button>
+        </div>
+      </div>
+      <div class="card">
+        <div id="ut">
+          <div class="ld">
+            <div class="sp"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Add Trip -->
+    <div class="page" id="page-at">
+      <div class="topbar">
+        <div class="topbar-left">
+          <h2>➕ إضافة رحلة جديدة</h2>
+        </div>
+      </div>
+      <div class="card">
+        <div class="fg">
+          <div class="f"><label>عنوان الرحلة *</label><input id="ft" placeholder="رحلة إلى دبي"></div>
+          <div class="f"><label>الموقع *</label><input id="fl" placeholder="دبي، الإمارات"></div>
+          <div class="f"><label>السعر (USD) *</label><input id="fp" type="number" placeholder="299.99"></div>
+          <div class="f"><label>عدد المقاعد</label><input id="fts" type="number" placeholder="30"></div>
+          <div class="f"><label>تاريخ البداية *</label><input id="fd1" type="date"></div>
+          <div class="f"><label>تاريخ النهاية *</label><input id="fd2" type="date"></div>
+          <div class="f"><label>وسيلة التنقل</label>
+            <select id="ftr">
+              <option value="Flight">✈ طيران</option>
+              <option value="Bus">🚌 حافلة</option>
+              <option value="Train">🚆 قطار</option>
+              <option value="Ship">🚢 سفينة</option>
+            </select>
+          </div>
+          <div class="f"><label>رابط الصورة</label><input id="fi" placeholder="https://..."></div>
+          <div class="f full"><label>الوصف</label><textarea id="fds" placeholder="وصف الرحلة..."></textarea></div>
+        </div>
+        <div class="fa">
+          <button class="btn btn-p" onclick="submitTrip()">💾 حفظ الرحلة</button>
+          <button class="btn btn-s" onclick="resetTripForm()">إلغاء</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Add User -->
+    <div class="page" id="page-au">
+      <div class="topbar">
+        <div class="topbar-left">
+          <h2>👤 إضافة مستخدم جديد</h2>
+        </div>
+      </div>
+      <div class="card">
+        <div class="fg">
+          <div class="f"><label>اسم المستخدم *</label><input id="un" placeholder="Ahmed Ali"></div>
+          <div class="f"><label>البريد الإلكتروني *</label><input id="ue" type="email" placeholder="ahmed@example.com">
+          </div>
+          <div class="f"><label>رقم الهاتف *</label><input id="up" placeholder="0512345678"></div>
+          <div class="f"><label>كلمة المرور *</label><input id="upw" type="password" placeholder="••••••••"></div>
+          <div class="f"><label>الدور</label>
+            <select id="ur">
+              <option value="client">👤 مستخدم عادي</option>
+              <option value="admin">🔑 مدير</option>
+            </select>
+          </div>
+        </div>
+        <div class="fa">
+          <button class="btn btn-p" onclick="submitUser()">💾 إضافة المستخدم</button>
+          <button class="btn btn-s" onclick="resetUserForm()">إلغاء</button>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Edit Trip Modal -->
+  <div class="mo" id="etm">
+    <div class="mbox">
+      <div class="mh">
+        <h3>✏️ تعديل الرحلة</h3><button class="mc" onclick="closeMo('etm')">✕</button>
+      </div>
+      <div class="fg">
+        <input type="hidden" id="eid">
+        <div class="f"><label>العنوان</label><input id="et"></div>
+        <div class="f"><label>الموقع</label><input id="el"></div>
+        <div class="f"><label>السعر</label><input id="ep" type="number"></div>
+        <div class="f"><label>المقاعد</label><input id="es" type="number"></div>
+        <div class="f"><label>تاريخ البداية</label><input id="ed1" type="date"></div>
+        <div class="f"><label>تاريخ النهاية</label><input id="ed2" type="date"></div>
+        <div class="f"><label>وسيلة التنقل</label>
+          <select id="etr">
+            <option value="Flight">✈ طيران</option>
+            <option value="Bus">🚌 حافلة</option>
+            <option value="Train">🚆 قطار</option>
+            <option value="Ship">🚢 سفينة</option>
+          </select>
+        </div>
+        <div class="f"><label>رابط الصورة</label><input id="ei2"></div>
+        <div class="f full"><label>الوصف</label><textarea id="eds"></textarea></div>
+      </div>
+      <div class="fa">
+        <button class="btn btn-p" onclick="updateTrip()">💾 حفظ</button>
+        <button class="btn btn-s" onclick="closeMo('etm')">إلغاء</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Edit User Modal -->
+  <div class="mo" id="eum">
+    <div class="mbox">
+      <div class="mh">
+        <h3>✏️ تعديل المستخدم</h3><button class="mc" onclick="closeMo('eum')">✕</button>
+      </div>
+      <div class="fg">
+        <input type="hidden" id="euid">
+        <div class="f"><label>اسم المستخدم *</label><input id="eun"></div>
+        <div class="f"><label>البريد الإلكتروني *</label><input id="eue" type="email"></div>
+        <div class="f"><label>رقم الهاتف *</label><input id="eup"></div>
+        <div class="f"><label>الدور</label>
+          <select id="eur">
+            <option value="client">👤 مستخدم عادي</option>
+            <option value="admin">🔑 مدير</option>
+          </select>
+        </div>
+        <div class="f full"><label>كلمة المرور الجديدة</label>
+          <input id="eupw" type="password" placeholder="اتركه فارغاً للإبقاء على الحالية">
+          <span class="hint">اتركه فارغاً للإبقاء على كلمة المرور الحالية</span>
+        </div>
+      </div>
+      <div class="fa">
+        <button class="btn btn-p" onclick="updateUser()">💾 حفظ</button>
+        <button class="btn btn-s" onclick="closeMo('eum')">إلغاء</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Confirm -->
+  <div class="confirm-mo" id="cdm">
+    <div class="confirm-box">
+      <h3 id="cdtitle">⚠️ تأكيد</h3>
+      <p id="cdmsg"></p>
+      <div class="confirm-actions">
+        <button class="btn btn-d" id="cdbtn">تأكيد</button>
+        <button class="btn btn-s" onclick="closeMo('cdm')">إلغاء</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+    const API = 'http://localhost:3000/api';
+    let token = '', trips = [], bookings = [], users = [], allBk = [];
+
+    async function doLogin() {
+      const e = document.getElementById('le').value, p = document.getElementById('lp').value;
+      const err = document.getElementById('lerr'); err.style.display = 'none';
+      try {
+        const r = await fetch(`${API}/auth/login`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email: e, password: p }) });
+        const d = await r.json();
+        if (!r.ok) { err.textContent = d.message || 'فشل'; err.style.display = 'block'; return; }
+        if (d.user?.role !== 'admin') { err.textContent = 'ليس لديك صلاحية مدير'; err.style.display = 'block'; return; }
+        token = d.token;
+        document.getElementById('an').textContent = d.user.username;
+        document.getElementById('ls').style.display = 'none';
+        loadDB(); loadTrips(); loadBookings(); loadUsers();
+      } catch { err.textContent = 'تعذر الاتصال'; err.style.display = 'block'; }
+    }
+
+    function go(page, btn) {
+      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+      document.querySelectorAll('.ni').forEach(b => b.classList.remove('active'));
+      document.getElementById('page-' + page).classList.add('active');
+      if (btn) btn.classList.add('active');
+      else {
+        const map = { at: 'إضافة رحلة', au: 'إضافة مستخدم', db: 'الرئيسية', tr: 'الرحلات', bk: 'الحجوزات', us: 'المستخدمون' };
+        document.querySelectorAll('.ni').forEach(b => { if (b.textContent.includes(map[page])) b.classList.add('active'); });
+      }
+    }
+
+    const H = () => ({ 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token });
+    const fd = s => s ? new Date(s).toLocaleDateString('ar-EG', { year: 'numeric', month: 'short', day: 'numeric' }) : '—';
+    const sar = s => ({ confirmed: '✅ مؤكد', pending: '⏳ معلق', cancelled: '❌ ملغي', ready: '🎒 جاهز' }[s] || s);
+
+    function toast(msg, type = 'ok') {
+      const t = document.getElementById('toast');
+      t.textContent = msg; t.className = `toast ${type} show`;
+      setTimeout(() => t.classList.remove('show'), 3200);
+    }
+    function closeMo(id) { document.getElementById(id).classList.remove('open'); }
+    function confirmAct(title, msg, btnClass, onConfirm) {
+      document.getElementById('cdtitle').textContent = title;
+      document.getElementById('cdmsg').textContent = msg;
+      const btn = document.getElementById('cdbtn');
+      btn.className = `btn ${btnClass}`;
+      document.getElementById('cdm').classList.add('open');
+      btn.onclick = () => { closeMo('cdm'); onConfirm(); };
+    }
+
+    // ── Dashboard ──────────────────────────────────────────────
+    async function loadDB() {
+      try {
+        const r = await fetch(`${API}/auth/stats`, { headers: H() });
+        const d = await r.json();
+        document.getElementById('sg').innerHTML = `
+      <div class="sc o"><div class="si">👥</div><div class="sv">${d.total_users || 0}</div><div class="sl">المستخدمون</div></div>
+      <div class="sc b"><div class="si">✈️</div><div class="sv">${d.total_trips || 0}</div><div class="sl">الرحلات</div></div>
+      <div class="sc y"><div class="si">📋</div><div class="sv">${d.total_bookings || 0}</div><div class="sl">الحجوزات</div></div>
+      <div class="sc g"><div class="si">💰</div><div class="sv">$${Math.round(d.total_revenue || 0)}</div><div class="sl">الإيرادات</div></div>`;
+      } catch { document.getElementById('sg').innerHTML = '<div class="ld">⚠️ تعذر التحميل</div>'; }
+
+      try {
+        const r = await fetch(`${API}/auth/bookings-all`, { headers: H() });
+        const d = await r.json();
+        const pending = (d.bookings || []).filter(b => b.status === 'pending');
+        const pc = document.getElementById('pendingCount');
+        pc.textContent = pending.length > 0 ? `${pending.length} حجز يحتاج مراجعة` : 'لا توجد حجوزات معلقة';
+
+        const rows = pending.slice(0, 10).map(b => `
+      <tr>
+        <td>#${b.id}</td>
+        <td><strong>${b.trip_title || '—'}</strong><br><small style="color:var(--m)">${b.location || ''}</small></td>
+        <td>${b.username || '—'}<br><small style="color:var(--m)">${b.email || ''}</small></td>
+        <td><strong style="color:var(--p)">$${b.total_price}</strong></td>
+        <td>${fd(b.created_at)}</td>
+        <td><div class="acts">
+          <button class="btn btn-g btn-sm" onclick="updateStatus(${b.id},'confirmed')">✅ قبول</button>
+          <button class="btn btn-w btn-sm" onclick="updateStatus(${b.id},'ready')">🎒 جاهز</button>
+          <button class="btn btn-d btn-sm" onclick="updateStatus(${b.id},'cancelled')">❌ رفض</button>
+        </div></td>
+      </tr>`).join('');
+
+        document.getElementById('rb').innerHTML = rows
+          ? `<div class="tw"><table><thead><tr><th>ID</th><th>الرحلة</th><th>المستخدم</th><th>المبلغ</th><th>التاريخ</th><th>الإجراء</th></tr></thead><tbody>${rows}</tbody></table></div>`
+          : '<div class="empty"><div class="ei">✅</div>لا توجد حجوزات معلقة</div>';
+      } catch { }
+    }
+
+    // ── تحديث حالة الحجز ──────────────────────────────────────
+    async function updateStatus(id, status) {
+      const labels = { confirmed: 'قبول الحجز', cancelled: 'رفض الحجز', ready: 'تأكيد الجاهزية', pending: 'إعادة تعليق' };
+      const classes = { confirmed: 'btn-g', cancelled: 'btn-d', ready: 'btn-w', pending: 'btn-s' };
+
+      confirmAct(
+        labels[status] || status,
+        `هل تريد تغيير حالة الحجز #${id} إلى "${sar(status)}"؟`,
+        classes[status] || 'btn-p',
+        async () => {
+          try {
+            const r = await fetch(`${API}/bookings/${id}/status`, {
+              method: 'PUT', headers: H(), body: JSON.stringify({ status })
+            });
+            const d = await r.json();
+            if (r.ok) {
+              toast(`✅ تم ${labels[status]} — إشعار أُرسل للمستخدم`);
+              loadDB(); loadBookings();
+            } else toast('❌ ' + (d.message || 'فشل'), 'er');
+          } catch { toast('❌ خطأ في الاتصال', 'er'); }
+        }
+      );
+    }
+
+    // ── Trips ──────────────────────────────────────────────────
+    async function loadTrips() {
+      try {
+        const r = await fetch(`${API}/trips`);
+        const d = await r.json();
+        trips = d.trips || d || []; renderTrips(trips);
+      } catch { document.getElementById('tt').innerHTML = '<div class="ld">⚠️ تعذر التحميل</div>'; }
+    }
+    function renderTrips(list) {
+      if (!list.length) { document.getElementById('tt').innerHTML = '<div class="empty"><div class="ei">🗺️</div>لا توجد رحلات</div>'; return; }
+      const rows = list.map(t => `
+    <tr>
+      <td><img class="ti" src="${t.image_url || ''}" onerror="this.style.display='none'"><strong>${t.title}</strong></td>
+      <td>${t.location || '—'}</td>
+      <td><strong style="color:var(--p)">$${t.price}</strong></td>
+      <td>${fd(t.start_date)}</td><td>${fd(t.end_date)}</td><td>${t.max_seats || '—'}</td>
+      <td><button class="btn btn-s btn-sm" onclick="openEditTrip(${t.id})">✏️ تعديل</button></td>
+    </tr>`).join('');
+      document.getElementById('tt').innerHTML = `<div class="tw"><table>
+    <thead><tr><th>الرحلة</th><th>الموقع</th><th>السعر</th><th>البداية</th><th>النهاية</th><th>المقاعد</th><th>إجراء</th></tr></thead>
+    <tbody>${rows}</tbody></table></div>`;
+    }
+    function ftrips(q) { renderTrips(trips.filter(t => t.title?.toLowerCase().includes(q.toLowerCase()) || t.location?.toLowerCase().includes(q.toLowerCase()))); }
+
+    function openEditTrip(id) {
+      const t = trips.find(x => x.id === id); if (!t) return;
+      document.getElementById('eid').value = t.id;
+      document.getElementById('et').value = t.title || '';
+      document.getElementById('el').value = t.location || '';
+      document.getElementById('ep').value = t.price || '';
+      document.getElementById('es').value = t.max_seats || '';
+      document.getElementById('ed1').value = t.start_date?.split('T')[0] || '';
+      document.getElementById('ed2').value = t.end_date?.split('T')[0] || '';
+      document.getElementById('etr').value = t.transport_type || 'Flight';
+      document.getElementById('ei2').value = t.image_url || '';
+      document.getElementById('eds').value = t.description || '';
+      document.getElementById('etm').classList.add('open');
+    }
+    async function updateTrip() {
+      const id = document.getElementById('eid').value;
+      const body = {
+        title: document.getElementById('et').value, location: document.getElementById('el').value,
+        price: parseFloat(document.getElementById('ep').value), max_seats: parseInt(document.getElementById('es').value) || 50,
+        start_date: document.getElementById('ed1').value, end_date: document.getElementById('ed2').value,
+        transport_type: document.getElementById('etr').value, image_url: document.getElementById('ei2').value,
+        description: document.getElementById('eds').value
+      };
+      try {
+        const r = await fetch(`${API}/trips/${id}`, { method: 'PUT', headers: H(), body: JSON.stringify(body) });
+        if (r.ok) { toast('✅ تم تحديث الرحلة'); closeMo('etm'); loadTrips(); loadDB(); }
+        else { const d = await r.json(); toast('❌ ' + (d.message || 'فشل'), 'er'); }
+      } catch { toast('❌ خطأ', 'er'); }
+    }
+    async function submitTrip() {
+      const body = {
+        title: document.getElementById('ft').value, location: document.getElementById('fl').value,
+        price: parseFloat(document.getElementById('fp').value), max_seats: parseInt(document.getElementById('fts').value) || 30,
+        start_date: document.getElementById('fd1').value, end_date: document.getElementById('fd2').value,
+        transport_type: document.getElementById('ftr').value, image_url: document.getElementById('fi').value,
+        description: document.getElementById('fds').value
+      };
+      if (!body.title || !body.price || !body.start_date || !body.end_date) { toast('⚠️ أكمل الحقول المطلوبة', 'er'); return; }
+      try {
+        const r = await fetch(`${API}/trips`, { method: 'POST', headers: H(), body: JSON.stringify(body) });
+        const d = await r.json();
+        if (r.ok) { toast('✅ تمت إضافة الرحلة'); resetTripForm(); loadTrips(); loadDB(); document.querySelectorAll('.ni')[1].click(); }
+        else toast('❌ ' + (d.message || 'فشل'), 'er');
+      } catch { toast('❌ خطأ', 'er'); }
+    }
+    function resetTripForm() { ['ft', 'fl', 'fp', 'fts', 'fd1', 'fd2', 'fi', 'fds'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; }); }
+
+    // ── Bookings ───────────────────────────────────────────────
+    async function loadBookings() {
+      try {
+        const r = await fetch(`${API}/auth/bookings-all`, { headers: H() });
+        const d = await r.json();
+        allBk = d.bookings || []; bookings = allBk; renderBK(bookings);
+      } catch { document.getElementById('bt').innerHTML = '<div class="ld">⚠️ تعذر التحميل</div>'; }
+    }
+    function renderBK(list) {
+      if (!list.length) { document.getElementById('bt').innerHTML = '<div class="empty"><div class="ei">📋</div>لا توجد حجوزات</div>'; return; }
+      const rows = list.map(b => `
+    <tr>
+      <td>#${b.id}</td>
+      <td><strong>${b.trip_title || '—'}</strong><br><small style="color:var(--m)">${b.location || ''}</small></td>
+      <td>${b.username || '—'}<br><small style="color:var(--m)">${b.email || ''}</small></td>
+      <td><strong style="color:var(--p)">$${b.total_price}</strong></td>
+      <td><span class="badge ${b.status}">${sar(b.status)}</span></td>
+      <td>${fd(b.created_at)}</td>
+      <td><div class="acts">
+        ${b.status === 'pending' ? `<button class="btn btn-g btn-sm" onclick="updateStatus(${b.id},'confirmed')">✅ قبول</button>` : ''}
+        ${b.status === 'pending' || b.status === 'confirmed' ? `<button class="btn btn-w btn-sm" onclick="updateStatus(${b.id},'ready')">🎒 جاهز</button>` : ''}
+        ${b.status !== 'cancelled' ? `<button class="btn btn-d btn-sm" onclick="updateStatus(${b.id},'cancelled')">❌ رفض</button>` : ''}
+      </div></td>
+    </tr>`).join('');
+      document.getElementById('bt').innerHTML = `<div class="tw"><table>
+    <thead><tr><th>ID</th><th>الرحلة</th><th>المستخدم</th><th>المبلغ</th><th>الحالة</th><th>التاريخ</th><th>الإجراء</th></tr></thead>
+    <tbody>${rows}</tbody></table></div>`;
+    }
+    function fbk(q) { renderBK(bookings.filter(b => b.trip_title?.toLowerCase().includes(q.toLowerCase()) || b.username?.toLowerCase().includes(q.toLowerCase()))); }
+    function filterByStatus(s) { bookings = s ? allBk.filter(b => b.status === s) : allBk; renderBK(bookings); }
+
+    // ── Users ──────────────────────────────────────────────────
+    async function loadUsers() {
+      try {
+        const r = await fetch(`${API}/auth/users`, { headers: H() });
+        const d = await r.json();
+        users = d.users || []; renderUS(users);
+      } catch { document.getElementById('ut').innerHTML = '<div class="ld">⚠️ تعذر التحميل</div>'; }
+    }
+    function renderUS(list) {
+      if (!list.length) { document.getElementById('ut').innerHTML = '<div class="empty"><div class="ei">👥</div>لا يوجد مستخدمون</div>'; return; }
+      const rows = list.map(u => `
+    <tr><td>#${u.id}</td><td><strong>${u.username}</strong></td><td>${u.email}</td>
+    <td>${u.phone_number || '—'}</td>
+    <td><span class="badge ${u.role}">${u.role === 'admin' ? 'مدير' : 'مستخدم'}</span></td>
+    <td>${fd(u.created_at)}</td>
+    <td><div class="acts">
+      <button class="btn btn-s btn-sm" onclick="openEditUser(${u.id})">✏️ تعديل</button>
+      <button class="btn btn-d btn-sm" onclick="deleteUser(${u.id},'${u.username}')">🗑️ حذف</button>
+    </div></td></tr>`).join('');
+      document.getElementById('ut').innerHTML = `<div class="tw"><table>
+    <thead><tr><th>ID</th><th>الاسم</th><th>الإيميل</th><th>الهاتف</th><th>الدور</th><th>التسجيل</th><th>إجراء</th></tr></thead>
+    <tbody>${rows}</tbody></table></div>`;
+    }
+    function fus(q) { renderUS(users.filter(u => u.username?.toLowerCase().includes(q.toLowerCase()) || u.email?.toLowerCase().includes(q.toLowerCase()))); }
+
+    async function submitUser() {
+      const body = {
+        username: document.getElementById('un').value.trim(), email: document.getElementById('ue').value.trim(),
+        phone_number: document.getElementById('up').value.trim(), password: document.getElementById('upw').value,
+        role: document.getElementById('ur').value
+      };
+      if (!body.username || !body.email || !body.phone_number || !body.password) { toast('⚠️ أكمل الحقول', 'er'); return; }
+      try {
+        const r = await fetch(`${API}/auth/users`, { method: 'POST', headers: H(), body: JSON.stringify(body) });
+        const d = await r.json();
+        if (r.ok) { toast('✅ تم إضافة المستخدم'); resetUserForm(); loadUsers(); loadDB(); document.querySelectorAll('.ni')[3].click(); }
+        else toast('❌ ' + (d.message || 'فشل'), 'er');
+      } catch { toast('❌ خطأ', 'er'); }
+    }
+    function resetUserForm() { ['un', 'ue', 'up', 'upw'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; }); document.getElementById('ur').value = 'client'; }
+
+    function openEditUser(id) {
+      const u = users.find(x => x.id === id); if (!u) return;
+      document.getElementById('euid').value = u.id;
+      document.getElementById('eun').value = u.username || '';
+      document.getElementById('eue').value = u.email || '';
+      document.getElementById('eup').value = u.phone_number || '';
+      document.getElementById('eur').value = u.role || 'client';
+      document.getElementById('eupw').value = '';
+      document.getElementById('eum').classList.add('open');
+    }
+    async function updateUser() {
+      const id = document.getElementById('euid').value;
+      const body = {
+        username: document.getElementById('eun').value.trim(), email: document.getElementById('eue').value.trim(),
+        phone_number: document.getElementById('eup').value.trim(), role: document.getElementById('eur').value,
+        password: document.getElementById('eupw').value
+      };
+      if (!body.username || !body.email || !body.phone_number) { toast('⚠️ أكمل الحقول', 'er'); return; }
+      try {
+        const r = await fetch(`${API}/auth/users/${id}`, { method: 'PUT', headers: H(), body: JSON.stringify(body) });
+        const d = await r.json();
+        if (r.ok) { toast('✅ تم تحديث المستخدم'); closeMo('eum'); loadUsers(); }
+        else toast('❌ ' + (d.message || 'فشل'), 'er');
+      } catch { toast('❌ خطأ', 'er'); }
+    }
+    function deleteUser(id, name) {
+      confirmAct('🗑️ حذف مستخدم', `هل تريد حذف "${name}"؟`, 'btn-d', async () => {
+        try {
+          const r = await fetch(`${API}/auth/users/${id}`, { method: 'DELETE', headers: H() });
+          const d = await r.json();
+          if (r.ok) { toast('✅ تم الحذف'); loadUsers(); loadDB(); }
+          else toast('❌ ' + (d.message || 'فشل'), 'er');
+        } catch { toast('❌ خطأ', 'er'); }
+      });
+    }
+  </script>
+</body>
+
+</html>

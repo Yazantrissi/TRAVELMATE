@@ -1,0 +1,577 @@
+{
+  "info": {
+    "name": "TravelMate Backend - API Tests",
+    "description": "Postman collection لتجربة/اختبار TravelMate backend. يقوم بعمل Login لاستخراج token ثم يستخدمه على باقي الـ endpoints.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "version": "1.0.0"
+  },
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Register (client)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/register",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "register"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"{{client_username}}\",\n  \"email\": \"{{client_email}}\",\n  \"phone_number\": \"{{client_phone}}\",\n  \"password\": \"{{client_password}}\"\n}"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Login (client) -> token",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "login"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{client_email}}\",\n  \"password\": \"{{client_password}}\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "const json = pm.response.json();",
+                  "pm.test('token exists', function () {",
+                  "  pm.expect(json.token).to.be.a('string');",
+                  "});",
+                  "pm.environment.set('token', json.token);",
+                  "pm.environment.set('auth_username', json.user && json.user.username ? json.user.username : '');",
+                  "pm.environment.set('auth_userId', json.user && json.user.id ? String(json.user.id) : '');"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Login (admin) -> adminToken",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "login"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{admin_email}}\",\n  \"password\": \"{{admin_password}}\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "const json = pm.response.json();",
+                  "pm.test('admin token exists', function () {",
+                  "  pm.expect(json.token).to.be.a('string');",
+                  "});",
+                  "pm.environment.set('adminToken', json.token);",
+                  "pm.environment.set('admin_role', json.user && json.user.role ? json.user.role : '');",
+                  "pm.environment.set('admin_username', json.user && json.user.username ? json.user.username : '');"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Trips",
+      "item": [
+        {
+          "name": "Get all trips (public)",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/trips",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "trips"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "const json = pm.response.json();",
+                  "pm.test('trips array exists', function () {",
+                  "  pm.expect(json.trips).to.be.an('array');",
+                  "});",
+                  "if (Array.isArray(json.trips) && json.trips.length > 0) {",
+                  "  const first = json.trips[0];",
+                  "  pm.environment.set('tripId', String(first.id || first.trip_id || first.tripId || first.ID || ''));",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get trip details (public) using {{tripId}}",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/trips/{{tripId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "trips",
+                "{{tripId}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Add trip (admin)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/trips",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "admin",
+                "trips"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"{{trip_title}}\",\n  \"description\": \"{{trip_description}}\",\n  \"price\": {{trip_price}},\n  \"start_date\": \"{{trip_start_date}}\",\n  \"end_date\": \"{{trip_end_date}}\",\n  \"location\": \"{{trip_location}}\",\n  \"transport_type\": \"{{trip_transport_type}}\",\n  \"image_url\": \"{{trip_image_url}}\",\n  \"max_seats\": {{trip_max_seats}}\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 201', function () {",
+                  "  pm.response.to.have.status(201);",
+                  "});",
+                  "const json = pm.response.json();",
+                  "pm.test('tripId exists if returned', function () {",
+                  "  pm.expect(json.tripId || json.id).to.not.equal(undefined);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Friends",
+      "item": [
+        {
+          "name": "Search friend by phone (authenticated)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/friends/search",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "friends",
+                "search"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"phone_number\": \"{{friend_phone}}\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200 or 404', function () {",
+                  "  pm.expect([200, 404]).to.include(pm.response.code);",
+                  "});",
+                  "if (pm.response.code === 200) {",
+                  "  const json = pm.response.json();",
+                  "  if (json && json.id) pm.environment.set('friendId', String(json.id));",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Send friend request (authenticated)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/friends/request",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "friends",
+                "request"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"friend_id\": {{friendId}},\n  \"category\": \"Friends\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (!pm.environment.get('friendId')) {",
+                  "  pm.execution.skipRequest('friendId is empty');",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "List my friends (authenticated)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/friends/list",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "friends",
+                "list"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Bookings",
+      "item": [
+        {
+          "name": "Initiate group booking (authenticated) using tripId",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/bookings/group",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "bookings",
+                "group"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"trip_id\": {{tripId}},\n  \"passengers\": [1]\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get my bookings (authenticated)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/bookings",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "bookings"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Notifications",
+      "item": [
+        {
+          "name": "Get notifications (authenticated)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/notifications",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "notifications"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Chat (Rooms)",
+      "item": [
+        {
+          "name": "Get/Create room for tripId (authenticated)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/chat/rooms/{{tripId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "chat",
+                "rooms",
+                "{{tripId}}"
+              ]
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3000"
+    },
+    {
+      "key": "client_username",
+      "value": "test_user_1"
+    },
+    {
+      "key": "client_email",
+      "value": "test_user_1@example.com"
+    },
+    {
+      "key": "client_phone",
+      "value": "01000000001"
+    },
+    {
+      "key": "client_password",
+      "value": "testpass123"
+    },
+    {
+      "key": "admin_email",
+      "value": "admin@travelmate.com"
+    },
+    {
+      "key": "admin_password",
+      "value": "password"
+    },
+    {
+      "key": "friend_phone",
+      "value": "01000000002"
+    },
+    {
+      "key": "friendId",
+      "value": ""
+    },
+    {
+      "key": "tripId",
+      "value": "1"
+    },
+    {
+      "key": "token",
+      "value": ""
+    },
+    {
+      "key": "adminToken",
+      "value": ""
+    },
+    {
+      "key": "trip_title",
+      "value": "Trip Postman Admin"
+    },
+    {
+      "key": "trip_description",
+      "value": "Description for admin trip"
+    },
+    {
+      "key": "trip_price",
+      "value": "1000"
+    },
+    {
+      "key": "trip_start_date",
+      "value": "2026-06-01"
+    },
+    {
+      "key": "trip_end_date",
+      "value": "2026-06-10"
+    },
+    {
+      "key": "trip_location",
+      "value": "Cairo"
+    },
+    {
+      "key": "trip_transport_type",
+      "value": "Car"
+    },
+    {
+      "key": "trip_image_url",
+      "value": "https://example.com/image.jpg"
+    },
+    {
+      "key": "trip_max_seats",
+      "value": "20"
+    }
+  ]
+}
