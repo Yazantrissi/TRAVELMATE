@@ -2,8 +2,13 @@ const express = require('express');
 const router = express.Router();
 const ChatController = require('../controllers/ChatController');
 const auth = require('../middleware/auth');
+const BotRoutes = require('./BotRoutes');
 
 router.use(auth);
+
+// Chatbot
+router.use('/bot', BotRoutes);
+
 
 // ─── Groups ───────────────────────────────────────────────
 router.get('/groups', ChatController.getUserGroups);
