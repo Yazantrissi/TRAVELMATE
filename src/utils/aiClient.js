@@ -52,26 +52,124 @@ async function getGeminiReply({ message, systemPrompt }) {
   }
 
   const { GoogleGenAI } = require('@google/genai');
-  const genAI = new GoogleGenAI(apiKey);
-
-  const modelName = process.env.GEMINI_MODEL || 'gemini-1.5-flash';
-  const model = genAI.getGenerativeModel({ model: modelName });
-
-  const fullPrompt = systemPrompt
-    ? `${systemPrompt}\n\n${message}`
-    : message;
-
-  const result = await model.generateContent({
-    contents: [
-      {
-        role: 'user',
-        parts: [{ text: fullPrompt }]
-      }
-    ]
+  // للـ Google AI Studio/Generative Language API (بدون Vertex)
+  // ملاحظة: بعض إصدارات SDK تحتاج baseUrl صارحة لتجنب v1beta غير المتوافق.
+  const genAI = new GoogleGenAI({
+    apiKey,
+    // endpoint الافتراضي غالبًا صحيح، لكن نحدده هنا تجنبًا لتطابق v1beta في حال SDK عندك يستخدمه
+    baseUrl: process.env.GEMINI_BASE_URL || 'https://generativelanguage.googleapis.com'
   });
 
-  const text = result?.response?.text?.();
-  return (text || '').trim() || 'لم يتم الحصول على رد من النموذج.';
+  const requestedModel = process.env.GEMINI_MODEL || 'gemini-1.5-flash';
+  const fullPrompt = systemPrompt ? `${systemPrompt}\n\n${message}` : message;
+
+  // إذا كان اسم النموذج غير مدعوم/غير متاح للحساب أو لإصدار الـ API
+  // نجرّب جلب قائمة النماذج المتاحة ثم نختار بديل مناسب.
+  let availableModels = [];
+  try {
+    if (typeof genAI.models?.listModels === 'function') {
+      const res = await genAI.models.listModels();
+      availableModels = res?.models || res?.data?.models || res?.items || [];
+    } else if (typeof genAI.listModels === 'function') {
+      const res = await genAI.listModels();
+      availableModels = res?.models || res?.data?.models || res?.items || [];
+    }
+  } catch (e) {
+    // لا نمنع الاستدعاء حتى لو فشل جلب النماذج
+  }
+
+  if (process.env.DEBUG_MODE === 'true') {
+    console.log('[Gemini] requestedModel=', requestedModel);
+    console.log('[Gemini] availableModelsCount=', Array.isArray(availableModels) ? availableModels.length : 0);
+    const namesPreview = availableModels
+      ?.map(m => m?.name || m?.model || m?.id)
+      ?.filter(Boolean)
+      ?.slice(0, 15);
+    console.log('[Gemini] availableModelsPreview=', namesPreview);
+  }
+
+  const normalizeModelName = m => {
+    if (!m) return '';
+    return m.name || m.model || m.id || '';
+  };
+
+  const candidateNames = availableModels.map(normalizeModelName).filter(Boolean);
+
+  const pickModel = () => {
+    if (!candidateNames.length) return requestedModel;
+    if (candidateNames.includes(requestedModel)) return requestedModel;
+
+    const requestedLower = requestedModel.toLowerCase();
+
+    // fallback داخل عائلة gemini-1.5
+    const fallbacks15 = candidateNames.filter(n => n.toLowerCase().includes('gemini-1.5'));
+    if (requestedLower.includes('gemini-1.5') && fallbacks15.length) return fallbacks15[0];
+
+    // fallback عام لأي gemini
+    const geminiAny = candidateNames.filter(n => n.toLowerCase().includes('gemini'));
+    if (geminiAny.length) return geminiAny[0];
+
+    return requestedModel;
+  };
+
+  const modelName = pickModel();
+
+  let result;
+  try {
+    result = await genAI.models.generateContent({
+      model: modelName,
+      contents: [
+        {
+          role: 'user',
+          parts: [{ text: fullPrompt }]
+        }
+      ]
+    });
+  } catch (err) {
+    // إذا كان النموذج ما زال يسبب 404 جرّب مرة ثانية على أول model متاح
+    if (candidateNames.length && modelName !== candidateNames[0]) {
+      result = await genAI.models.generateContent({
+        model: candidateNames[0],
+        contents: [
+          {
+            role: 'user',
+            parts: [{ text: fullPrompt }]
+          }
+        ]
+      });
+    } else if (requestedModel !== modelName && modelName) {
+      // لا يوجد candidateNames أو listModels رجع فاضي: جرّب طلب استخدام نموذج بديل جاهز معروف
+      const hardFallbacks = ['gemini-1.5-pro', 'gemini-1.5-flash-8b', 'gemini-1.5-flash-latest'];
+      const fb = hardFallbacks.find(x => x.toLowerCase() !== modelName.toLowerCase());
+      if (fb) {
+        result = await genAI.models.generateContent({
+          model: fb,
+          contents: [
+            {
+              role: 'user',
+              parts: [{ text: fullPrompt }]
+            }
+          ]
+        });
+      } else {
+        throw err;
+      }
+    } else {
+      // أظهر معلومات أوضح بدل استمرار خطأ الـ404 غير مفسّر
+      if (process.env.DEBUG_MODE === 'true') {
+        console.log('[Gemini] generateContent failed with model=', modelName);
+      }
+      throw err;
+    }
+  }
+
+  const text =
+    result?.response?.text?.() ||
+    result?.text ||
+    result?.candidates?.[0]?.content?.parts?.map(p => p?.text).join('') ||
+    '';
+
+  return text.trim() || 'لم يتم الحصول على رد من النموذج.';
 }
 
 /**
