@@ -1,4 +1,4 @@
-const { getOpenAIReply } = require('../utils/aiClient');
+const { getReply } = require('../utils/aiClient');
 
 function buildSystemPrompt() {
   return `أنت مساعد ذكي متخصص في السفر (TravelMate).
@@ -17,7 +17,7 @@ exports.message = async (req, res) => {
       return res.status(400).json({ message: 'الرسالة مطلوبة' });
     }
 
-    const reply = await getOpenAIReply({
+    const reply = await getReply({
       message,
       systemPrompt: buildSystemPrompt()
     });
